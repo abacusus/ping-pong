@@ -1,19 +1,19 @@
-// select canvas element
+
 const canvas = document.getElementById("pong");
 const ctx = canvas.getContext("2d");
 
-// Ball object
+
 const ball = {
   x: canvas.width / 2,
   y: canvas.height / 2,
-  radius: 10,
+  radius: 10,                              // Ball 
   velocityX: 5,
   velocityY: 5,
   speed: 7,
   color: "WHITE",
 };
 
-// User Paddle (Player 1)
+
 const user = {
   x: 0,
   y: (canvas.height - 100) / 2,
@@ -24,7 +24,7 @@ const user = {
   dy: 0,
 };
 
-// Player 2 Paddle
+
 const player2 = {
   x: canvas.width - 10,
   y: (canvas.height - 100) / 2,
@@ -35,7 +35,7 @@ const player2 = {
   dy: 0,
 };
 
-// NET
+
 const net = {
   x: (canvas.width - 2) / 2,
   y: 0,
@@ -44,7 +44,11 @@ const net = {
   color: "WHITE",
 };
 
-// draw functions
+
+let player1Name = "Player 1";
+let player2Name = "Player 2";
+
+
 function drawRect(x, y, w, h, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, w, h);
@@ -64,11 +68,12 @@ function drawNet() {
   }
 }
 
-function drawText(text, x, y) {
+function drawText(text, x, y, size = "75px") {
   ctx.fillStyle = "#FFF";
-  ctx.font = "75px fantasy";
+  ctx.font = `${size} fantasy`;
   ctx.fillText(text, x, y);
 }
+
 
 function collision(b, p) {
   return (
@@ -79,6 +84,7 @@ function collision(b, p) {
   );
 }
 
+
 function resetBall() {
   ball.x = canvas.width / 2;
   ball.y = canvas.height / 2;
@@ -86,12 +92,19 @@ function resetBall() {
   ball.speed = 7;
 }
 
+
 function checkWin() {
   if (user.score === 10 || player2.score === 10) {
     clearInterval(loop);
-    document.body.innerHTML = `<div class='win-screen'>${user.score === 10 ? "Player 1" : "Player 2"} Wins!<br><button onclick='location.reload()'>Play Again</button></div>`;
+    document.body.innerHTML = `
+      <div class='win-screen'>
+        ${user.score === 10 ? player1Name : player2Name} Wins!
+        <br>
+        <button onclick='location.reload()'>Play Again</button>
+      </div>`;
   }
 }
+
 
 function update() {
   ball.x += ball.velocityX;
@@ -127,22 +140,32 @@ function update() {
   checkWin();
 }
 
+
 function render() {
   drawRect(0, 0, canvas.width, canvas.height, "#000");
+
+  
   drawText(user.score, canvas.width / 4, canvas.height / 5);
   drawText(player2.score, (3 * canvas.width) / 4, canvas.height / 5);
+
+
   drawNet();
   drawRect(user.x, user.y, user.width, user.height, user.color);
   drawRect(player2.x, player2.y, player2.width, player2.height, player2.color);
   drawArc(ball.x, ball.y, ball.radius, ball.color);
+
+  // player names at the bottom
+  drawText(player1Name, canvas.width / 4 - 50, canvas.height - 10, "20px");
+  drawText(player2Name, (3 * canvas.width) / 4 - 50, canvas.height - 10, "20px");
 }
+
 
 function game() {
   update();
   render();
 }
 
-// Keyboard controls
+// controls
 window.addEventListener("keydown", (e) => {
   if (e.key === "w") user.dy = -8;
   if (e.key === "s") user.dy = 8;
@@ -155,10 +178,21 @@ window.addEventListener("keyup", (e) => {
   if (e.key === "ArrowUp" || e.key === "ArrowDown") player2.dy = 0;
 });
 
-// Start game only when button is clicked
+
 let loop;
 document.getElementById("startButton").addEventListener("click", function () {
-  this.style.display = "none"; // Hide the button
-  canvas.style.display = "block"; // Show the canvas
-  loop = setInterval(game, 1000 / 50); // Start the game loop
+  
+  const p1Input = document.getElementById("player1").value;
+  const p2Input = document.getElementById("player2").value;
+
+  if (p1Input.trim() !== "") player1Name = p1Input;
+  if (p2Input.trim() !== "") player2Name = p2Input;
+
+  
+  document.getElementById("playerNames").style.display = "none";
+  this.style.display = "none";
+  canvas.style.display = "block";
+
+  
+  loop = setInterval(game, 1000 / 50);
 });
